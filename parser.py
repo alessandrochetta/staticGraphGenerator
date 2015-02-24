@@ -21,7 +21,7 @@ fundamental_types = ['bool', 'char', 'int', 'short', 'long', 'float', 'double', 
 log = open('staticGraphGenerator.log', 'w')
 #
 # json file
-json_file = open('/Volumes/Macintosh HD/Applications/MAMP/htdocs/graph_visualizator/graph.json', 'w')
+json_file = open('graph_visualizator/graph.json', 'w')
 
 # input file retrieving_____________________________
 # 'source/' is the directory in which source files are stored

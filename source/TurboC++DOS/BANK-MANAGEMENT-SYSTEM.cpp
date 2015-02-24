@@ -20,6 +20,7 @@ class account
 	char name[50];
 	int deposit;
 	char type;
+	D d;
 public:
 	void create_account();	//function to get data from user
 	void show_account();	//function to show data on screen
