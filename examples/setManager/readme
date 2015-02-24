@@ -1,0 +1,14 @@
+Project description
+Compile all these files: main.cpp LinkedList.cpp Node.cpp OrderedCollection.cpp Set.cpp SetAsList.cpp SetAsOC.cpp 
+You can also use the Makefile in this folder
+Once the program is compiled and run, the following commands can be entered in the command line interface (as in the specification):
+l 	initialize the sets as LinkedLists
+o 	initialize the sets as OrderedCollections
+e 	erase set A
+s 	switch sets
+c 	copy content of set A into set B
+d 	display sets' content
+a 	add element to set A, a prompt will ask to insert a number
+u 	union
+i 	intersection
+q 	quit
