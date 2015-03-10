@@ -13,7 +13,7 @@ from Utility import ClassCollection
 fundamental_types = ['bool', 'char', 'int', 'short', 'long', 'float', 'double', 'wchar_t', 'char16_t', 'char32_t', 'String', 'string']
 
 # TODO: represent inheritance in the graph, multiple class inheritance, check whether the xml file is made by flex
-#
+#       deal with spaces in the source path
 #
 
 # output files declaration________________________________
@@ -95,9 +95,7 @@ for f in file_list:
             print "class changed in (subclass)" + current_class.name
             tok_file.next()
             continue
-        #
-        # class
-        #
+
         if tok_file.token_at(0).token == 'TOK_CLASS' and tok_file.token_at(1).token == 'TOK_ID':
             current_class = class_collection.class_from_name(tok_file.token_at(1).text)
             current_class.set_file_name(f)
@@ -109,13 +107,56 @@ for f in file_list:
         if not current_class.class_scope \
             and tok_file.token_at(0).token == 'TOK_ID' \
             and tok_file.token_at(1).token == 'TOK_COLON_COLON'\
-            and tok_file.token_at(2).token == 'TOK_ID':
-            current_class = class_collection.class_from_name(tok_file.token_at(0).text)
-            current_class.set_file_name(f)
-            current_class.set_line(tok_file.token_at(0).line)
-            tok_file.next()
-            print "classe " + current_class.name
-            continue
+            and tok_file.token_at(2).token == 'TOK_ID'\
+                and tok_file.token_at(3).token == 'TOK_LPAREN':
+            par_count = 1
+            token_index = 4
+            while par_count != 0 and token_index <= tok_file.size:
+                if tok_file.token_at(token_index).token == 'TOK_LPAREN':
+                    par_count += 1
+                if tok_file.token_at(token_index).token == 'TOK_RPAREN':
+                    par_count -= 1
+                token_index += 1
+
+            if tok_file.token_at(token_index).token == 'TOK_CONST':
+                token_index += 1
+
+            if tok_file.token_at(token_index).token == 'TOK_LBRACE':
+                current_class = class_collection.class_from_name(tok_file.token_at(0).text)
+                current_class.set_file_name(f)
+                current_class.set_line(tok_file.token_at(0).line)
+                tok_file.next()
+                print "class changed in " + current_class.name
+                continue
+
+        if not current_class.class_scope \
+            and tok_file.token_at(0).token == 'TOK_ID' \
+            and tok_file.token_at(1).token == 'TOK_COLON_COLON'\
+            and tok_file.token_at(2).token == 'TOK_OPERATOR':
+            token_index = 3
+            par_count = 0
+            while par_count != 1 and token_index <= tok_file.size:
+                if tok_file.token_at(token_index).token == 'TOK_LPAREN':
+                    par_count = 1
+                token_index += 1
+
+            while par_count != 0 and token_index <= tok_file.size:
+                if tok_file.token_at(token_index).token == 'TOK_LPAREN':
+                    par_count += 1
+                if tok_file.token_at(token_index).token == 'TOK_RPAREN':
+                    par_count -= 1
+                token_index += 1
+
+            if tok_file.token_at(token_index).token == 'TOK_CONST':
+                token_index += 1
+
+            if tok_file.token_at(token_index).token == 'TOK_LBRACE':
+                current_class = class_collection.class_from_name(tok_file.token_at(0).text)
+                current_class.set_file_name(f)
+                current_class.set_line(tok_file.token_at(0).line)
+                tok_file.next()
+                print "class changed in " + current_class.name
+                continue
 
         if tok_file.token_at(0).token == 'TOK_LBRACE':
             current_class.class_parentheses_increase()
@@ -130,6 +171,10 @@ for f in file_list:
             #print "this token is out of any scope: " + tok_file.token_at(0).token
             tok_file.next()
             continue
+
+        #
+        # Increment current class size
+        current_class.increase_size(tok_file.token_at(0))
 
         # Declaration analysis____________________________________________________________________________________
         #
@@ -238,7 +283,16 @@ for f in file_list:
 # json file print
 json_file.write('{"nodes":[\n')
 
-for i in range(0, len(class_collection.classes)):
+# remove external classes
+# external classes are the classes that are not declared in the code
+# PROBLEMA, LE POSIZIONI DI RIFERIMENTO RIMANGONO QUELLE NEL class_collection.classes QUANDO VENGONO STAMPATI I LINK SUL JSON
+internal_classes = []
+for c in class_collection.classes:
+    if c.external:
+        continue
+    internal_classes.append(c)
+
+for i in range(0, len(internal_classes)):
     temp_class = class_collection.classes[i]
 
     if temp_class.is_superclass:
@@ -246,36 +300,58 @@ for i in range(0, len(class_collection.classes)):
     else:
         group = '0'
 
-    if i == len(class_collection.classes)-1:
-        json_file.write('{"name":"'+ temp_class.name+'","group": ' + str(group) + ' }\n')
+    if len(temp_class.superclasses) > 0:
+        is_subclass = 1
     else:
-        json_file.write('{"name":"'+temp_class.name+'","group":' + str(group) + '},\n')
+        is_subclass = 0
+
+    if i == len(internal_classes)-1:
+        json_file.write('{"name":"'+ temp_class.name+'","group": ' + str(group) + ',"subclass": ' + str(is_subclass) + ' }\n')
+    else:
+        json_file.write('{"name":"'+temp_class.name+'","group":' + str(group) + ',"subclass": ' + str(is_subclass) + ' },\n')
 
 json_file.write('],\n"links":[\n')
 
 links = []
 
+# dependencies links
 for c in class_collection.classes:
+    if c.external:
+        continue
     for i in c.instances:
-        links.append([class_collection.index_of(c), class_collection.index_of(i.class_instantiated)])
+        if i.class_instantiated.external:
+            continue
+        links.append([internal_classes.index(c), internal_classes.index(i.class_instantiated), 0])
+        # links.append([class_collection.index_of(c), class_collection.index_of(i.class_instantiated), 0])
+#
+# hierarchical links
+for c in class_collection.classes:
+    if c.external:
+        continue
+    for s in c.superclasses:
+        if s.external:
+            continue
+        links.append([internal_classes.index(c), internal_classes.index(s), 1])
+        #links.append([class_collection.index_of(c), class_collection.index_of(s), 1])
 
 for i in range(0, len(links)):
     l = links[i]
 
     if i == len(links)-1:
-        json_file.write('{"source":' + str(links[i][0]) + ',"target":' + str(links[i][1]) + ',"value":1 }\n')
+        json_file.write('{"source":' + str(links[i][0]) + ',"target":' + str(links[i][1]) + ',"value":' + str(links[i][2]) + ' }\n')
     else:
-        json_file.write('{"source":' + str(links[i][0]) + ',"target":' + str(links[i][1]) + ',"value":1 },\n')
+        json_file.write('{"source":' + str(links[i][0]) + ',"target":' + str(links[i][1]) + ',"value":' + str(links[i][2]) + ' },\n')
 
 json_file.write(']}')
 
 print "\nclasses\n"
 
 for c in class_collection.classes:
-    if c.file:
-        print c.name + " - at line " + str(c.line) + " in " + c.file
-    else:
+    if c.external:
         print c.name + " - EXTERNAL "
+    else:
+        print c.name + " size: " + str(c.size) + " - at line " + str(c.line) + " in " + c.file
+
     if c.is_superclass:
         print "is superclass"
     if len(c.superclasses) > 0:

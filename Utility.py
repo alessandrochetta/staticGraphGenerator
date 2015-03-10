@@ -67,15 +67,29 @@ class Class:
     def __init__(self, file_name):
         self.name = self.class_name_from_file_name(file_name)
         self.file = ''
+        self.external = True
         self.line = 0
+        self.size = 0
+        self.last_line = 0
         self.superclasses = []
         self.instances = []
         self.class_parentheses = 0
         self.class_scope = False
         self.is_superclass = False
 
+    def increase_size(self, token):
+        if self.size == 0:
+            self.last_line = token.line
+            self.size += 1
+            return
+        if self.last_line != token.line:
+            self.last_line = token.line
+            self.size += 1
+
+
     def set_file_name(self, file_name):
         self.file = file_name
+        self.external = False
 
     def set_line(self, line):
         self.line = line

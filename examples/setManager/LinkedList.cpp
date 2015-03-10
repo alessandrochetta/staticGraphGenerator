@@ -97,8 +97,3 @@ LinkedList::~LinkedList(){
     clear();
 }
 
-class A : public B {
-
-}
-
-

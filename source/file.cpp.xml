@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<file name="source/file.cpp">
+<line number="1" token="TOK_CLASS" text=""/>
+<line number="1" token="TOK_ID" text="A"/>
+<line number="1" token="TOK_LBRACE" text=""/>
+<line number="3" token="TOK_RBRACE" text=""/>
+</file>
