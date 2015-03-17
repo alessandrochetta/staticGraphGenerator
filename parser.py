@@ -309,7 +309,6 @@ for c in class_collection.classes:
 
 #
 #
-#
 # json file print
 json_file.write('{"nodes":[\n')
 
@@ -366,12 +365,9 @@ for c in class_collection.classes:
     xml_file.write('\t</class>\n')
 xml_file.write('</classes>')
 
-
-#
 #
 #
 # print in the console for a quick feedback
-
 print "\nclasses\n"
 
 for c in class_collection.classes:
