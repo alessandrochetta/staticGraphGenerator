@@ -13,7 +13,7 @@ from Utility import ClassCollection
 fundamental_types = ['bool', 'char', 'int', 'short', 'long', 'float', 'double', 'wchar_t', 'char16_t', 'char32_t', 'String', 'string']
 
 # TODO: represent inheritance in the graph, multiple class inheritance, check whether the xml file is made by flex
-#       deal with spaces in the source path
+# TODO: deal with spaces in the source path, maybe declaration between '' are takne into account
 #
 
 # output files declaration________________________________
