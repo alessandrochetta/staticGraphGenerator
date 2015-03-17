@@ -22,6 +22,9 @@ log = open('staticGraphGenerator.log', 'w')
 #
 # json file
 json_file = open('graph_visualizator/graph.json', 'w')
+#
+# xml file (file in which all the information about classes are stored)
+xml_file = open('graph_xml.xml', 'w')
 
 # input file retrieving_____________________________
 # 'source/' is the directory in which source files are stored
@@ -48,8 +51,6 @@ for f in file_list:
     log.write('\t' + f + '\n')
 
 print '\n'
-
-
 
 # classes data structure
 class_collection = ClassCollection()
@@ -277,20 +278,40 @@ for f in file_list:
 
         tok_file.next()
 
+# data structures to support the file writing
 #
-#
-#
-# json file print
-json_file.write('{"nodes":[\n')
-
 # remove external classes
 # external classes are the classes that are not declared in the code
-# PROBLEMA, LE POSIZIONI DI RIFERIMENTO RIMANGONO QUELLE NEL class_collection.classes QUANDO VENGONO STAMPATI I LINK SUL JSON
 internal_classes = []
 for c in class_collection.classes:
     if c.external:
         continue
     internal_classes.append(c)
+
+links = []
+# dependencies links
+for c in class_collection.classes:
+    if c.external:
+        continue
+    for i in c.instances:
+        if i.class_instantiated.external:
+            continue
+        links.append([internal_classes.index(c), internal_classes.index(i.class_instantiated), 0])
+#
+# hierarchical links
+for c in class_collection.classes:
+    if c.external:
+        continue
+    for s in c.superclasses:
+        if s.external:
+            continue
+        links.append([internal_classes.index(c), internal_classes.index(s), 1])
+
+#
+#
+#
+# json file print
+json_file.write('{"nodes":[\n')
 
 for i in range(0, len(internal_classes)):
     temp_class = class_collection.classes[i]
@@ -312,27 +333,6 @@ for i in range(0, len(internal_classes)):
 
 json_file.write('],\n"links":[\n')
 
-links = []
-
-# dependencies links
-for c in class_collection.classes:
-    if c.external:
-        continue
-    for i in c.instances:
-        if i.class_instantiated.external:
-            continue
-        links.append([internal_classes.index(c), internal_classes.index(i.class_instantiated), 0])
-        # links.append([class_collection.index_of(c), class_collection.index_of(i.class_instantiated), 0])
-#
-# hierarchical links
-for c in class_collection.classes:
-    if c.external:
-        continue
-    for s in c.superclasses:
-        if s.external:
-            continue
-        links.append([internal_classes.index(c), internal_classes.index(s), 1])
-        #links.append([class_collection.index_of(c), class_collection.index_of(s), 1])
 
 for i in range(0, len(links)):
     l = links[i]
@@ -343,6 +343,34 @@ for i in range(0, len(links)):
         json_file.write('{"source":' + str(links[i][0]) + ',"target":' + str(links[i][1]) + ',"value":' + str(links[i][2]) + ' },\n')
 
 json_file.write(']}')
+
+#
+#
+# write xml file
+xml_file.write('<classes>\n')
+for c in class_collection.classes:
+    # print class informations
+    xml_file.write('\t<class name="' + c.name + '" size="' + str(c.size) +
+                   '" external="' + str(c.external) + '" file="' + c.file + '" line="' + c.line + '">\n')
+    # print class superclasses
+    xml_file.write('\t<superclasses>\n')
+    for s in c.superclasses:
+        xml_file.write('\t\t<superclass name="' + s.name + '"/>\n')
+    xml_file.write('\t</superclasses>\n')
+    # print class instances
+    xml_file.write('\t<instances>\n')
+    for i in c.instances:
+        xml_file.write('\t\t<instance name="' + i.class_instantiated.name + '" file="' + i.file_name +
+                       '" line="' + i.code_line + '"/>\n')
+    xml_file.write('\t</instances>\n')
+    xml_file.write('\t</class>\n')
+xml_file.write('</classes>')
+
+
+#
+#
+#
+# print in the console for a quick feedback
 
 print "\nclasses\n"
 

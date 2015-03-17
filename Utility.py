@@ -86,7 +86,6 @@ class Class:
             self.last_line = token.line
             self.size += 1
 
-
     def set_file_name(self, file_name):
         self.file = file_name
         self.external = False
