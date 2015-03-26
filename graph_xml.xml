@@ -1,0 +1,15 @@
+<classes>
+	<class name="A" size="1" external="False" file="source/file.cpp.xml" line="1">
+	<superclasses>
+	</superclasses>
+	<instances>
+		<instance name="B" file="source/file.cpp.xml" line="2"/>
+	</instances>
+	</class>
+	<class name="B" size="0" external="False" file="source/file.cpp.xml" line="5">
+	<superclasses>
+	</superclasses>
+	<instances>
+	</instances>
+	</class>
+</classes>
