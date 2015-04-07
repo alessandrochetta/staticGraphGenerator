@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<file name="prova.cpp">
+<line number="1" token="TOK_CLASS" text=""/>
+<line number="1" token="TOK_ID" text="A"/>
+<line number="1" token="TOK_LBRACE" text=""/>
+<line number="2" token="TOK_STRING" text=""/>
+<line number="3" token="TOK_ID" text="ok"/>
+<line number="4" token="TOK_STRING" text=""/>
+<line number="5" token="TOK_STRING" text=""/>
+<line number="6" token="TOK_RBRACE" text=""/>
+</file>

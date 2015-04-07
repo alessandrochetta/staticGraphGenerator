@@ -30,8 +30,8 @@ NON_NUMBER			"0"{DIGIT}+
 SPACES				[ \t\n\r\f\v]
 COMMENT				"//"[^\n\r]*
 MULTILINE_COMMENT	"/*"([^\*]|[\*]+[^\*\/])*[*]+[/]
-STRING              "\""[.|\n]*"\""
-
+/*STRING              "\""[.|\n]*"\"" */
+STRING              "\""[^"\r\n]*"\""|"'"[^"\r\n]*"'"
 
 
 

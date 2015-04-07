@@ -13,7 +13,7 @@ from Utility import ClassCollection
 fundamental_types = ['bool', 'char', 'int', 'short', 'long', 'float', 'double', 'wchar_t', 'char16_t', 'char32_t', 'String', 'string']
 
 # TODO: represent inheritance in the graph, multiple class inheritance, check whether the xml file is made by flex
-# TODO: deal with spaces in the source path, maybe declaration between '' are takne into account
+# TODO: deal with spaces in the source path, maybe declaration between '' are taken into account
 #
 
 # output files declaration________________________________
@@ -350,7 +350,7 @@ xml_file.write('<classes>\n')
 for c in class_collection.classes:
     # print class informations
     xml_file.write('\t<class name="' + c.name + '" size="' + str(c.size) +
-                   '" external="' + str(c.external) + '" file="' + c.file + '" line="' + c.line + '">\n')
+                   '" external="' + str(c.external) + '" file="' + c.file + '" line="' + str(c.line) + '">\n')
     # print class superclasses
     xml_file.write('\t<superclasses>\n')
     for s in c.superclasses:
