@@ -313,7 +313,7 @@ for c in class_collection.classes:
 json_file.write('{"nodes":[\n')
 
 for i in range(0, len(internal_classes)):
-    temp_class = class_collection.classes[i]
+    temp_class = internal_classes[i]
 
     if temp_class.is_superclass:
         group = '1'

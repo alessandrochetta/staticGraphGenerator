@@ -1,31 +1,54 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
+<header>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="underscore.js"></script>
+    <meta charset="utf-8">
+    <style>
 
-.node {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
+    body{
+        background-color: #ecf0f1;
+    }
 
-.link {
-  stroke: #999;
-  stroke-opacity: .6;
-}
+    .node {
+        stroke-width: 1.5px;
+        cursor: pointer;
+    }
 
-</style>
+    .title-text{
+        font-family: "Helvetica Neue";
+        fill: white;
+    }
+
+    .link {
+      stroke: #999;
+      stroke-opacity: .6;
+    }
+    </style>
+</header>
 <body>
-  <script src="http://d3js.org/d3.v3.min.js"></script>
-  <script src="underscore.js"></script>
+    <nav class="navbar navbar-default navbar-static-top" style="margin-bottom: 0">
+        <div class="container-fluid">
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li onclick="render()" id="static_button"><a href="#">Static </a></li>
+                    <li ><a href="#">Link</a></li>
+                </ul>
+
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
   <script>
+      
 
   var width = window.innerWidth,
   height = window.innerHeight;
 
-  console.log("W: " + width);
-  console.log("H: " + height);
-
   var _graph;
-
 
   var color = function(d){
     switch(d){
@@ -36,7 +59,7 @@
         case 1: return '#2ca02c';
         break;
       }
-    }
+    };
 
     var link_type_color = function(d){
       switch(d){
@@ -45,7 +68,7 @@
         case 1: return color(d);
         break;
       }
-    }
+    };
 
     var link_type_width = function(d){
       switch(d){
@@ -54,32 +77,32 @@
         case 1: return '2px';
         break;
       }
-    }
+    };
 
     var node_stroke_width = function(d){
       if(d == 1)
         return "2px";
       else
         return "0px";
-    }
+    };
 
     var force = d3.layout.force()
-    .charge(-10000)
-    .linkDistance(100)
-    .friction(0.05)
-    .gravity(0.2)
-    .linkStrength(0.2)
-    .size([width, height]);
+        .charge(-10000)
+        .linkDistance(100)
+        .friction(0.05)
+        .gravity(0.2)
+        .linkStrength(0.2)
+        .size([width, height]);
 
     var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+        .attr("width", width)
+        .attr("height", height);
 
     var button = svg.append("circle")
-    .attr("cx", 30)
-    .attr("cy", 30)
-    .attr("r", 0)
-    .style("fill", "red");
+        .attr("cx", 30)
+        .attr("cy", 30)
+        .attr("r", 10)
+        .style("fill", "red");
 
 
     button.on("mousedown", function() {
@@ -98,7 +121,17 @@
 
   // Redraw graph
   draw(graph);
-})
+});
+
+  function render(){
+      // Change graph
+      var graph;
+
+      graph = _graph;
+
+      // Redraw graph
+      draw(graph);
+  }
 
     d3.json("graph.json", function(error, graph) {
       _graph = graph;
@@ -111,8 +144,6 @@
       .links(graph.links)
       .start();
 
-
-
       var link = svg.selectAll(".link").data(graph.links)
       .style("stroke-width", function(d) { 
         return link_type_width(d.value);
@@ -120,6 +151,7 @@
       .style("stroke", function(d) { 
         return link_type_color(d.value);
       });
+
       link.enter().append("line")
       .attr("class", "link")
       .style("stroke-width", function(d) { 
@@ -130,16 +162,13 @@
       });
       link.exit().remove();
 
-
-
   // Select + update
   var node = svg.selectAll(".node").data(graph.nodes);                  
 
   // Enter
   var newNodes = node.enter()                              
   .append("g")
-  .classed("node", true)                          
-  .style("cursor", "pointer")
+  .classed("node", true)
   .call(force.drag)
   .each(function(d) {
     var gNodeSel = d3.select(this);
@@ -151,12 +180,8 @@
       var texts = gNodeSel.append("text")
               .classed("title-text", true)
               .attr("x",0)
-      .attr("y", 20)
-      .attr("font-size", 15)
-      .attr("text-anchor","middle")
-      .attr("font-family", "Helvetica Neue")
-      .attr("font-weight", "100")
-      .attr("fill", "white")
+              .attr("y", 20)
+              .attr("text-anchor","middle")
               .text(function(d) {
                 return d.name;
               });
