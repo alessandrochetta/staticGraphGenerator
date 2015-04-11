@@ -1,5 +1,5 @@
 # staticGraphGenerator
-The project aim is to analyze C++ code to represent graphically its dependencies graph -- Visit the wiki to to figure out how the system works
+The project aim is to analyze C++ code to represent graphically its dependencies graph -- Visit the wiki to figure out how the system works
 
 Main languages:
 - Python - parser.py - the parser
